@@ -1,27 +1,31 @@
-const friendDatabase = {};
+import { Friends } from "./dbConnectors";
 
-class Friend {
-    constructor(id, { firstName, lastName, email, gender, contacts}) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.gender = gender;
-        this.contacts = contacts;
-    }
-}
 
+//resolver map
 //const root = { hello: () => "hi! i am sushma"};
-const resolvers = { 
-    getFriend: ({ id}) => {
-       return new Friend(id, friendDatabase)
-    },
-    createFriend: ({input}) => {
-        let id = require('crypto').randomBytes(10).toString('hex');
-        friendDatabase[id] = input;
-        return new Friend(id, input);
-    }
+export const resolvers = { 
+    Query:{
+        getFriend: ({ id}) => {
+            return new Friend(id, friendDatabase)
+         },
+    },      
+    mutation:{
+        createFriend: (root,{ input }) => { 
+            const newFriend = new Friends({        
+                firstName = input.firstName,
+                lastName = input.lastName,
+                email = input.email,
+                gender = input.gender          
+            });
+            newFriend.id = newFriend._id;
 
+            return new Promise((resolve, object) => {
+                newFriend.save((err) => {
+                   if(error) reject(err) 
+                   else resolve(newFriend)
+                })
+            })
+        },
+    }
 };
 
-export default resolvers;
